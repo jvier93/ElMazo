@@ -6,6 +6,7 @@ export function Carta({
   functionToExecute = () => {},
   textToShow,
   inGame = false,
+  srcInGame,
   src,
   src75,
   index = null,
@@ -28,16 +29,13 @@ export function Carta({
     <div className="relative  ">
       <img
         alt="Imagen de la carta"
-        className={
-          inGame ? " border-4  border-red-600 rounded-lg" : " rounded-lg"
-        }
-        src={width > 640 ? src : src75}
+        src={width > 640 ? (inGame ? srcInGame : src) : src75}
       ></img>
 
       <a
         className={
           showButton
-            ? " focus:outline-none text-xs sm:text-base h-8 w-full font-Mate   text-center rounded-b-lg  text-white  bg-gray-600 bg-opacity-60 text-opacity-80 hover:text-opacity-100  hover:bg-opacity-90 absolute bottom-0"
+            ? " focus:outline-none text-xs sm:text-base h-8 w-full font-Mate   text-center rounded-b-sm  text-white  bg-gray-600 bg-opacity-60 text-opacity-80 hover:text-opacity-100  hover:bg-opacity-90 absolute bottom-0"
             : "  h-8 w-full  font-Mate  text-center rounded-b-lg text-white  bg-gray-600 bg-opacity-70 absolute bottom-0 invisible"
         }
         onClick={() => {

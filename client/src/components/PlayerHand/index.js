@@ -103,42 +103,48 @@ export const PlayerHand = ({
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                 >
-                  {hand.map(({ _imgFront, _inGame, _imgFront75 }, index) => {
-                    return (
-                      <Draggable
-                        key={index}
-                        draggableId={index + "card"}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <Carta
-                              functionToExecute={cutMode ? cutGame : playCard}
-                              functionToCutGame={cutGame}
-                              inGame={_inGame}
-                              cardIn={"player"}
-                              myHand={myHand}
-                              showButton={
-                                (showButton && !cutMode) ||
-                                (showButton && cutMode && !_inGame)
-                                  ? true
-                                  : false
-                              }
-                              textToShow={cutMode ? "Cortar" : "Tirar"}
-                              index={index}
-                              src={_imgFront}
-                              src75={_imgFront75}
-                              sound={sound}
-                            ></Carta>
-                          </div>
-                        )}
-                      </Draggable>
-                    );
-                  })}
+                  {hand.map(
+                    (
+                      { _imgFront, _imgFrontGame, _inGame, _imgFront75 },
+                      index
+                    ) => {
+                      return (
+                        <Draggable
+                          key={index}
+                          draggableId={index + "card"}
+                          index={index}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <Carta
+                                functionToExecute={cutMode ? cutGame : playCard}
+                                functionToCutGame={cutGame}
+                                inGame={_inGame}
+                                srcInGame={_imgFrontGame}
+                                cardIn={"player"}
+                                myHand={myHand}
+                                showButton={
+                                  (showButton && !cutMode) ||
+                                  (showButton && cutMode && !_inGame)
+                                    ? true
+                                    : false
+                                }
+                                textToShow={cutMode ? "Cortar" : "Tirar"}
+                                index={index}
+                                src={_imgFront}
+                                src75={_imgFront75}
+                                sound={sound}
+                              ></Carta>
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    }
+                  )}
                   {provided.placeholder}
                 </div>
               )}
