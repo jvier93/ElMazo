@@ -168,52 +168,52 @@ function nspLaConga(io) {
       const user = getCurrentUser(socket.id);
       const laConga = getGame(user.room).game;
 
-      if (laConga.gameStatus === "pausa") {
-        if (laConga.players.length > 1) {
-          if (!laConga.hasWinPlayer(laConga.rules.score)) {
-            laConga.startGame();
-            startTimer(user.room, nsp);
-
-            //Actualizamos la lista de rooms
-            const games = getAllGames();
-            nsp.emit("updateRoomList", games);
-
-            nsp
-              .to(user.room)
-              .emit(
-                "message",
-                formatMessage("server bot", `El juego ha comenzado!`)
-              );
-
-            nsp.to(user.room).emit("updateDeck", laConga.deck);
-            nsp.to(user.room).emit("updateTable", laConga.table);
-            nsp.to(user.room).emit("updateCutTable", laConga.cutTable);
-            nsp.to(user.room).emit("showFrontCards", false);
-            nsp.to(user.room).emit("updatePlayers", laConga.players);
-          } else {
-            nsp
-              .to(user.room)
-              .emit("message", formatMessage("server bot", `Hay un ganador`));
-          }
-        } else {
-          nsp
-            .to(user.room)
-            .emit(
-              "message",
-              formatMessage(
-                "server bot",
-                `Debe haber mas de un jugador para iniciar`
-              )
-            );
-        }
-      } else {
-        nsp
+      //Si el juego esta iniciado notificarlo y retronar
+      if (laConga.gameStatus === "iniciado") {
+        return nsp
           .to(user.room)
           .emit(
             "message",
             formatMessage("server bot", `Las cartas ya fueron repartidas`)
           );
       }
+
+      //Si en el juego no hay players suficientes notificamos y retornamos
+      if (laConga.players.length <= 1) {
+        return nsp
+          .to(user.room)
+          .emit(
+            "message",
+            formatMessage(
+              "server bot",
+              `Debe haber mas de un jugador para iniciar`
+            )
+          );
+      }
+
+      //Si el juego ya ha sido ganado notificamos y retornamos
+      if (laConga.hasWinPlayer(laConga.rules.score)) {
+        return nsp
+          .to(user.room)
+          .emit("message", formatMessage("server bot", `Hay un ganador`));
+      }
+
+      laConga.startGame();
+      startTimer(user.room, nsp);
+
+      //Actualizamos la lista de rooms
+      const games = getAllGames();
+      nsp.emit("updateRoomList", games);
+
+      nsp
+        .to(user.room)
+        .emit("message", formatMessage("server bot", `El juego ha comenzado!`));
+      nsp.to(user.room).emit("updateDeck", laConga.deck);
+      nsp.to(user.room).emit("updateTable", laConga.table);
+      nsp.to(user.room).emit("updateCutTable", laConga.cutTable);
+      nsp.to(user.room).emit("showFrontCards", false);
+      nsp.to(user.room).emit("updateGameStatus", laConga._gameStatus);
+      nsp.to(user.room).emit("updatePlayers", laConga.players);
     });
 
     socket.on("cardsForTableToDeck", () => {
@@ -356,6 +356,7 @@ function nspLaConga(io) {
         notifyWinOrLose({ nsp, game: laConga, user });
 
         //Actualizamos las vistas
+        nsp.to(user.room).emit("updateGameStatus", laConga._gameStatus);
         nsp.to(user.room).emit("updatePlayers", laConga.players);
         nsp.to(user.room).emit("showFrontCards", true);
         nsp.to(user.room).emit("updateCutTable", laConga.cutTable);
@@ -493,6 +494,8 @@ function nspLaConga(io) {
 
           //Actualizamos la baraja ya que las cartas que tenia el jugador volvieron a la baraj
           nsp.to(userRoom).emit("updateDeck", currentGame.deck);
+          //Enviamos la actualizacion de estado del game
+          nsp.to(userRoom).emit("updateGameStatus", currentGame._gameStatus);
           //Actualizamos la vista de los jugadores que aun quedan en esta estancia
           nsp.to(userRoom).emit("updatePlayers", currentGame.players);
           nsp

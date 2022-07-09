@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { usePlaySound } from "../../hooks/usePlaySound";
 
 export const PlayerHand = ({
+  gameStatus,
   cutMode,
   inTurn,
   hands,
@@ -18,12 +19,13 @@ export const PlayerHand = ({
   const [showFront, setShowFront] = useState(false);
 
   useEffect(() => {
-    socket.on("showFrontCards", (showFront) => {
+    function handleShowFrontCards(showFront) {
       setShowFront(showFront);
-    });
+    }
+    socket.on("showFrontCards", handleShowFrontCards);
 
     return () => {
-      socket.off("showFrontCards");
+      socket.off("showFrontCards", handleShowFrontCards);
     };
   }, []);
 
@@ -52,7 +54,7 @@ export const PlayerHand = ({
   useEffect(() => {
     setHand(hands);
 
-    if (myHand && inTurn && hands.length === 8) {
+    if (myHand && inTurn && hands.length === 8 && gameStatus === "iniciado") {
       setShowButton(true);
     } else {
       setShowButton(false);

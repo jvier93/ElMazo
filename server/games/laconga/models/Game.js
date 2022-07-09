@@ -240,10 +240,9 @@ class Game {
 
   //Cambia el turno
   setTurn(playerTurn = null) {
-
-    if(playerTurn){
-      this.indexOfPlayerTurn = playerTurn
-      return
+    if (playerTurn) {
+      this.indexOfPlayerTurn = playerTurn;
+      return;
     }
     const qtyOfPlayers = this.players.length - 1;
 
@@ -345,13 +344,10 @@ class Game {
   }
 
   tableToDeck() {
-    console.log(this.table.cards.length);
     while (this.table.cards.length > 0) {
       this.deck.addCard(this.table.removeCard());
     }
     this.deck.shuffle();
-    console.log("baraja", this.deck);
-    console.log("mesa", this.table);
   }
 
   //Calcula los puntos de los jugadores

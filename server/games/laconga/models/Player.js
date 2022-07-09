@@ -139,14 +139,13 @@ class Player {
 
     //devuelve un juego de numeros
     function buildSuitGame(index, length) {
-
-      if (length === 4 ){
+      if (length === 4) {
         return {
           name: "juegoDePalos",
           indices: [index, index + 1, index + 2, index + 3],
-        };  
+        };
       }
-      
+
       return {
         name: "juegoDePalos",
         indices: [index, index + 1, index + 2],
@@ -157,37 +156,39 @@ class Player {
     function suitOfSuits(index, hand) {
       const card1 = hand[index]._suit;
       const card2 = hand[index + 1]._suit || null;
-      const card3 = hand[index + 2]._suit || null
-      const card4 = hand[index + 3] !== undefined ?  hand[index + 3]._suit : null
+      const card3 = hand[index + 2]._suit || null;
+      const card4 =
+        hand[index + 3] !== undefined ? hand[index + 3]._suit : null;
 
-     const card1Number = hand[index]._number || null;
-     const card2Number = hand[index + 1]._number || null;
-     const card3Number = hand[index + 2]._number || null;
-     const card4Number = hand[index + 3] !== undefined ? hand[index + 3]._number : null;
+      const card1Number = hand[index]._number || null;
+      const card2Number = hand[index + 1]._number || null;
+      const card3Number = hand[index + 2]._number || null;
+      const card4Number =
+        hand[index + 3] !== undefined ? hand[index + 3]._number : null;
 
-      if(card1 === card2 && card1 === card3 && card1 === card4){
+      if (card1 === card2 && card1 === card3 && card1 === card4) {
         //Puede parecer una mala practica hacer lo siguiente en vez de simplemente retornar la comprobacion, el tema es que no quiero retornar en caso de false
         //si no hacer la siguiente comprobacion
-        if(card1Number +1 === card2Number && card2Number + 1 === card3Number && card3Number+1 === card4Number){
-          console.log("hay juego de 4");
-          return {game:true, length:4}
+        if (
+          card1Number + 1 === card2Number &&
+          card2Number + 1 === card3Number &&
+          card3Number + 1 === card4Number
+        ) {
+          return { game: true, length: 4 };
         }
       }
-
 
       if (card1 === card2 && card1 === card3) {
-        if(  card1Number + 1 === card2Number &&
+        if (
+          card1Number + 1 === card2Number &&
           card2Number + 1 === card3Number
-        ){
-          return {game:true, length:3}
+        ) {
+          return { game: true, length: 3 };
         }
-        
       }
-    
-      return  {game:false, length:null}
-    }
 
-    
+      return { game: false, length: null };
+    }
 
     const playerGames = [];
 
@@ -198,7 +199,7 @@ class Player {
         newGameSuits = buildNumberGame(i);
       }
 
-      const {game, length} = suitOfSuits(i, this.hand)
+      const { game, length } = suitOfSuits(i, this.hand);
       if (game) {
         newGameNumber = buildSuitGame(i, length);
       }
@@ -231,10 +232,9 @@ class Player {
     }
   }
 
-//Nos devuelve un booleano de si este player esta habilitdo para seguir en juego, y nos devuelve su puntaje
-  thisPlayerCanPlay(){
-    return {canPlay: this.score < 100, score: this.score}
-
+  //Nos devuelve un booleano de si este player esta habilitdo para seguir en juego, y nos devuelve su puntaje
+  thisPlayerCanPlay() {
+    return { canPlay: this.score < 100, score: this.score };
   }
 
   //cuenta los puntos y los setea en score del jugador.

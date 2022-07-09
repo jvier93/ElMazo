@@ -3,6 +3,7 @@ import { PlayerHand } from "../PlayerHand";
 import { PlayerPanel } from "../PlayerPanel";
 
 export const Player = ({
+  gameStatus,
   myPlayer,
   player,
   myHand = false,
@@ -23,6 +24,7 @@ export const Player = ({
   return (
     <div className="   md:flex  md:justify-center">
       <PlayerHand
+        gameStatus={gameStatus}
         sound={sound}
         cutMode={cutMode}
         inTurn={player._inTurn}

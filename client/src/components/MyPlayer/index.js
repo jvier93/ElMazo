@@ -3,7 +3,14 @@ import { socket } from "./../Socket";
 import { Player } from "./../Player";
 import "./MyPlayer.css";
 
-export const MyPlayer = ({ sound, showModal, setShowModal, modalMessage, setModalMessage }) => {
+export const MyPlayer = ({
+  sound,
+  showModal,
+  setShowModal,
+  modalMessage,
+  setModalMessage,
+  gameStatus,
+}) => {
   const [myPlayer, setMyPlayer] = useState(null);
 
   useEffect(() => {
@@ -36,11 +43,15 @@ export const MyPlayer = ({ sound, showModal, setShowModal, modalMessage, setModa
     <div className="">
       {myPlayer !== null ? (
         <Player
+          gameStatus={gameStatus}
           myPlayer={true}
           myHand={true}
           player={myPlayer}
           sound={sound}
-          showModal={showModal} setShowModal={setShowModal} modalMessage={modalMessage} setModalMessage={setModalMessage}
+          showModal={showModal}
+          setShowModal={setShowModal}
+          modalMessage={modalMessage}
+          setModalMessage={setModalMessage}
         ></Player>
       ) : (
         <div></div>

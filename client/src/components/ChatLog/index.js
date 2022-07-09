@@ -10,8 +10,7 @@ import { faVolumeMute, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 
 export const ChatLog = ({}) => {
   const [log, setLog] = useState("");
-  const [showTimer, setShowTimer] = useState(false);
-  const [timeInSeconds, setTimeInSeconds] = useState(0);
+
   const [restart, setRestart] = useState(0);
   // const { play } = usePlaySound({ sound: "message" });
 
