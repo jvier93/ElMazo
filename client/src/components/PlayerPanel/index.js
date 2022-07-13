@@ -13,6 +13,7 @@ export const PlayerPanel = ({
   score,
   showModal,
   setShowModal,
+  setModalMode,
   modalMessage,
   setModalMessage,
 }) => {
@@ -34,6 +35,7 @@ export const PlayerPanel = ({
         setCutMode={setCutMode}
         showModal={showModal}
         setShowModal={setShowModal}
+        setModalMode={setModalMode}
         modalMessage={modalMessage}
         setModalMessage={setModalMessage}
       ></Controls>

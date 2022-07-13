@@ -76,7 +76,7 @@ export const CreateRoom = () => {
 
           <input
             autoComplete="off"
-            min="100"
+            min="30"
             max="1000"
             className=" text-black rounded focus:outline-none ml-1 pl-1 w-24 h-6"
             onChange={handleChangePoints}

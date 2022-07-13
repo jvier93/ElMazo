@@ -6,6 +6,7 @@ import "./MyPlayer.css";
 export const MyPlayer = ({
   sound,
   showModal,
+  setModalMode,
   setShowModal,
   modalMessage,
   setModalMessage,
@@ -49,6 +50,7 @@ export const MyPlayer = ({
           player={myPlayer}
           sound={sound}
           showModal={showModal}
+          setModalMode={setModalMode}
           setShowModal={setShowModal}
           modalMessage={modalMessage}
           setModalMessage={setModalMessage}

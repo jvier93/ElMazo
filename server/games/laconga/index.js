@@ -77,7 +77,9 @@ function nspLaConga(io) {
           );
 
         nsp.to(roomName).emit("updateDeck", laConga.deck);
-        nsp.to(roomName).emit("updatePlayers", laConga.players);
+        nsp
+          .to(roomName)
+          .emit("updatePlayers", laConga.players, laConga._gameStatus);
       } else {
         //Avisamos que ya existe una room con ese nombre
         socket.emit(
@@ -139,7 +141,13 @@ function nspLaConga(io) {
 
             nsp.to(roomName).emit("updateDeck", gameToJoin.deck);
 
-            nsp.to(roomName).emit("updatePlayers", gameToJoin.players);
+            nsp
+              .to(roomName)
+              .emit(
+                "updatePlayers",
+                gameToJoin.players,
+                gameToJoin._gameStatus
+              );
           } else {
             //Avisamos que la password no es correcta
             socket.emit(
@@ -213,7 +221,9 @@ function nspLaConga(io) {
       nsp.to(user.room).emit("updateCutTable", laConga.cutTable);
       nsp.to(user.room).emit("showFrontCards", false);
       nsp.to(user.room).emit("updateGameStatus", laConga._gameStatus);
-      nsp.to(user.room).emit("updatePlayers", laConga.players);
+      nsp
+        .to(user.room)
+        .emit("updatePlayers", laConga.players, laConga._gameStatus);
     });
 
     socket.on("cardsForTableToDeck", () => {
@@ -243,7 +253,9 @@ function nspLaConga(io) {
       if (player.inTurn && player.hand.length === 7) {
         player.recieveCard(laConga.deck.dealOne());
         laConga.findAndBuildGames(socket.id);
-        nsp.to(user.room).emit("updatePlayers", laConga.players);
+        nsp
+          .to(user.room)
+          .emit("updatePlayers", laConga.players, laConga._gameStatus);
 
         if (laConga.deck.cards.length === 0) {
           laConga.tableToDeck();
@@ -287,7 +299,9 @@ function nspLaConga(io) {
       if (player.inTurn && player.hand.length === 7) {
         player.recieveCard(laConga.table.removeCard());
         laConga.findAndBuildGames(socket.id);
-        nsp.to(user.room).emit("updatePlayers", laConga.players);
+        nsp
+          .to(user.room)
+          .emit("updatePlayers", laConga.players, laConga._gameStatus);
         nsp.to(user.room).emit("updateTable", laConga.table);
       } else {
         socket.emit(
@@ -305,35 +319,89 @@ function nspLaConga(io) {
       const notifyWinOrLose = function ({ nsp, game, user }) {
         const scoreLimit = game.rules.score;
 
-        if (game.hasWinPlayer(scoreLimit)) {
-          let playerWiner = game.players.find((player) => {
-            return player.score < scoreLimit;
-          }).name;
-
-          nsp.to(user.room).emit("playerNotification", {
-            showModal: true,
-            modalMessage: `${playerWiner} ha ganado, pulsa aceptar para volver a la sala principal`,
+        const extractPointsDetailOfPlayers = function (players, scoreLimit) {
+          const playersDetail = [];
+          players.forEach((player) => {
+            playersDetail.push({
+              socketId: player._socketId,
+              name: player._name,
+              score: player._score,
+              scoreLimit,
+            });
           });
-        } else {
-          game.players.map((player) => {
-            if (player.score >= scoreLimit) {
+          return playersDetail;
+        };
+
+        const playersDetail = extractPointsDetailOfPlayers(
+          game.players,
+          scoreLimit
+        );
+        const gameHasWinPlayer = game.hasWinPlayer(scoreLimit);
+
+        if (gameHasWinPlayer) {
+          //Si hay un ganador queremos brindar un mensaje "personalizado al que gano"
+
+          //buscamos el player ganador la variables a continuacion guardan su detalle
+          let playerWinner = game.players.find((player) => {
+            return player.score < scoreLimit;
+          });
+          let playerWinnerSocketId = playerWinner.socketId;
+          let playerWinnerName = playerWinner.name;
+
+          //recorremos este array que contiene a todos los players en este juego
+          game.players.forEach((player) => {
+            //si el player que estamos procesando en este step concide con el que gano el juego
+            if (player.socketId === playerWinnerSocketId) {
+              //le enviamos un mensaje personalizado.
               nsp.to(player.socketId).emit("playerNotification", {
                 showModal: true,
-                modalMessage: `${user.username} gano esta ronda, llegaste al limite de puntos - ${scoreLimit} puedes salir pulsando aceptar`,
+                modalMessage: {
+                  title: "Has ganado el juego",
+                  body: "pulsa aceptar para volver a la sala principal",
+                },
+                scoreDetails: playersDetail,
+                modalMode: "endGameNotification",
               });
+              //al resto le enviamos un mensaje con el nombre del ganador.
             } else {
-              nsp
-                .to(player.socketId)
-                .emit(
-                  "message",
-                  formatMessage(
-                    "server bot",
-                    `${user.username} gano esta ronda`
-                  )
-                );
+              nsp.to(player.socketId).emit("playerNotification", {
+                showModal: true,
+                modalMessage: {
+                  title: `${playerWinnerName} ha ganado el juego`,
+                  body: "pulsa aceptar para volver a la sala principal",
+                },
+                scoreDetails: playersDetail,
+                modalMode: "endGameNotification",
+              });
             }
           });
+
+          return;
         }
+
+        game.players.map((player) => {
+          if (player.score >= scoreLimit) {
+            nsp.to(player.socketId).emit("playerNotification", {
+              showModal: true,
+              modalMessage: {
+                title: `${user.username} gano esta ronda`,
+                body: `llegaste al limite de puntos - ${scoreLimit} puedes salir pulsando aceptar`,
+              },
+              scoreDetails: playersDetail,
+              modalMode: "endRoundNotification",
+            });
+          } else {
+            nsp.to(player.socketId).emit("playerNotification", {
+              showModal: true,
+              modalMessage: {
+                title: `${user.username} gano esta ronda`,
+                body: "",
+              },
+              scoreDetails: playersDetail,
+              modalMode: "endRoundNotification",
+            });
+          }
+        });
       };
 
       const user = getCurrentUser(socket.id);
@@ -350,18 +418,22 @@ function nspLaConga(io) {
       ) {
         //Tiramos la carta con la cual cortamos a la mesa de corte (cutTable)
         laConga.cutTable.addCard(player.playCard(indexOfCardToCutGame));
+        //Contamos los puntos
         laConga.scorePoints();
         stopTimer(room, nsp);
         laConga.gameStatus = "pausa";
+
         notifyWinOrLose({ nsp, game: laConga, user });
 
         //Actualizamos las vistas
         nsp.to(user.room).emit("updateGameStatus", laConga._gameStatus);
-        nsp.to(user.room).emit("updatePlayers", laConga.players);
+        nsp
+          .to(user.room)
+          .emit("updatePlayers", laConga.players, laConga._gameStatus);
         nsp.to(user.room).emit("showFrontCards", true);
         nsp.to(user.room).emit("updateCutTable", laConga.cutTable);
 
-        //Actualizamos la lista de rooms ya que se hicieron cambios
+        //Actualizamos la lista de rooms ya que el juego se pauso (el estado del juego lo mostramos en la lista de rooms)
         const games = getAllGames();
         nsp.emit("updateRoomList", games);
       }
@@ -394,7 +466,9 @@ function nspLaConga(io) {
         }
 
         //Actualizamos las vistas
-        nsp.to(user.room).emit("updatePlayers", laConga.players);
+        nsp
+          .to(user.room)
+          .emit("updatePlayers", laConga.players, laConga._gameStatus);
         nsp.to(user.room).emit("updateTable", laConga.table);
         nsp
           .to(user.room)
@@ -471,7 +545,13 @@ function nspLaConga(io) {
           //Actualizamos la baraja ya que las cartas que tenia el jugador volvieron a la baraja
           nsp.to(userRoom).emit("updateDeck", currentGame.deck);
           //Actualizamos la vista de los jugadores que aun quedan en esta estancia
-          nsp.to(userRoom).emit("updatePlayers", currentGame.players);
+          nsp
+            .to(userRoom)
+            .emit(
+              "updatePlayers",
+              currentGame.players,
+              currentGame._gameStatus
+            );
           nsp
             .to(userRoom)
             .emit(
@@ -497,7 +577,13 @@ function nspLaConga(io) {
           //Enviamos la actualizacion de estado del game
           nsp.to(userRoom).emit("updateGameStatus", currentGame._gameStatus);
           //Actualizamos la vista de los jugadores que aun quedan en esta estancia
-          nsp.to(userRoom).emit("updatePlayers", currentGame.players);
+          nsp
+            .to(userRoom)
+            .emit(
+              "updatePlayers",
+              currentGame.players,
+              currentGame._gameStatus
+            );
           nsp
             .to(userRoom)
             .emit(

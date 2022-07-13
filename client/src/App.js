@@ -46,9 +46,13 @@ function App() {
                 setGameName={setGameName}
               ></SignIn>
             );
-          } else if (registrado && playerRoom === "#000") {
+          }
+
+          if (registrado && playerRoom === "#000") {
             return <Rooms roomList={roomList} nombre={nombre}></Rooms>; //De aqui se gestiona la creacion y union de usuarios recien "registrados" a las rooms del game elegido previamente
-          } else if (registrado && playerRoom !== "#000") {
+          }
+
+          if (registrado && playerRoom !== "#000") {
             return <Game sound={true}></Game>; //Si el usuario esta registrado y ya pertenece a una room se muestra el game;
           }
         })()}

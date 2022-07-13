@@ -11,10 +11,13 @@ import { ModalNotification } from "../ModalNotification/ModalNotification";
 
 export const Game = ({ sound }) => {
   const [showModal, setShowModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
+  const [modalMessage, setModalMessage] = useState({ title: "", body: "" });
+  //modal mode: el modo en el que se desplegara el modal mas detalles en el componente
+  const [modalMode, setModalMode] = useState("");
   const [gameStatus, setGameStatus] = useState("pausa");
   useEffect(() => {
     function handleUpdateGameStatus(gameStatus) {
+      console.log("se ejecuto game status", gameStatus);
       setGameStatus(gameStatus);
     }
 
@@ -29,13 +32,14 @@ export const Game = ({ sound }) => {
       <div>
         <OtherPlayers></OtherPlayers>
         <div className="flex justify-center gap-4  my-4 md:my-10 ">
-          <Deck gameStatus={gameStatus} sound={sound}></Deck>
+          <Deck sound={sound}></Deck>
           <CutTable></CutTable>
-          <Table gameStatus={gameStatus} sound={sound}></Table>
+          <Table sound={sound}></Table>
         </div>
         <MyPlayer
           gameStatus={gameStatus}
           showModal={showModal}
+          setModalMode={setModalMode}
           setShowModal={setShowModal}
           modalMessage={modalMessage}
           setModalMessage={setModalMessage}
@@ -43,6 +47,8 @@ export const Game = ({ sound }) => {
         ></MyPlayer>
         <ModalNotification
           showModal={showModal}
+          modalMode={modalMode}
+          setModalMode={setModalMode}
           setShowModal={setShowModal}
           modalMessage={modalMessage}
           setModalMessage={setModalMessage}

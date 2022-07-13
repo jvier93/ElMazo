@@ -10,6 +10,7 @@ export const Player = ({
   sound,
   showModal,
   setShowModal,
+  setModalMode,
   modalMessage,
   setModalMessage,
 }) => {
@@ -46,6 +47,7 @@ export const Player = ({
         cutMode={cutMode}
         setCutMode={setCutMode}
         showModal={showModal}
+        setModalMode={setModalMode}
         setShowModal={setShowModal}
         modalMessage={modalMessage}
         setModalMessage={setModalMessage}

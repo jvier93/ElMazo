@@ -4,7 +4,7 @@ import { Carta } from "../Carta/index.js";
 import { usePlaySound } from "../../hooks/usePlaySound";
 import "./Table.css";
 
-export function Table({ sound, gameStatus }) {
+export function Table({ sound }) {
   const [table, setTable] = useState({ _cards: [] });
   const [showButton, setShowButton] = useState(false);
   const { play } = usePlaySound({ sound: "deslizar2" });
@@ -20,8 +20,7 @@ export function Table({ sound, gameStatus }) {
     function handleUpdateTable(table) {
       setTable(table);
     }
-    function evalShowButton(players) {
-      //Game status lo consigo a traves de la cadena de scope, se lo paso como prop del componente
+    function evalShowButton(players, gameStatus) {
       const playerInTurn = players.find((player) => {
         return player._inTurn;
       });

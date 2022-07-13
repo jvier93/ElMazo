@@ -55,7 +55,13 @@ function startTimer(timerTo, socketIoObject) {
     if (timeInSeconds === 0) {
       timeInSeconds = gameData.game.rules.timePerPlayer;
       gameData.game.setTurn();
-      socketIoObject.to(timerTo).emit("updatePlayers", gameData.game._players);
+      socketIoObject
+        .to(timerTo)
+        .emit(
+          "updatePlayers",
+          gameData.game._players,
+          gameData.game._gameStatus
+        );
       socketIoObject.to(timerTo).emit("updateTimer", {
         timeInSeconds,
         message: `Juega: ${

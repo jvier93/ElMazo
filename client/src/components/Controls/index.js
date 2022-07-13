@@ -2,7 +2,6 @@ import React from "react";
 import { socket } from "../Socket";
 
 export const Controls = ({
-  
   inTurn,
   myPlayer,
   admin,
@@ -12,20 +11,21 @@ export const Controls = ({
   qtyPlayerCards,
   showModal,
   setShowModal,
+  setModalMode,
   modalMessage,
-  setModalMessage
+  setModalMessage,
 }) => {
   function startGame() {
     socket.emit("startGame");
   }
 
-  function handleClickPlayerLeave(){
-    setModalMessage("¿Desea abandonar el juego?")
-   setShowModal(true)
+  function handleClickPlayerLeave() {
+    setModalMessage({ title: "¿Desea abandonar el juego?", body: "" });
+    setModalMode("playerLeave");
+    setShowModal(true);
   }
 
   function handleClickCutMode() {
-
     numOfPlayerGames === 2 && qtyPlayerCards === 8
       ? setCutMode(true)
       : console.log(
@@ -51,7 +51,10 @@ export const Controls = ({
               >
                 Cortar
               </button>
-              <button onClick={handleClickPlayerLeave} className=" w-20 text-sm rounded  hover:text-white font-Mate bg-gray-400 px-2  mx-1 md:my-1">
+              <button
+                onClick={handleClickPlayerLeave}
+                className=" w-20 text-sm rounded  hover:text-white font-Mate bg-gray-400 px-2  mx-1 md:my-1"
+              >
                 Abandonar
               </button>
             </div>
@@ -63,7 +66,10 @@ export const Controls = ({
               >
                 Cortar
               </button>
-              <button onClick={handleClickPlayerLeave} className=" w-20 text-sm rounded  hover:text-white font-Mate bg-gray-400 px-2  mx-1 md:my-1">
+              <button
+                onClick={handleClickPlayerLeave}
+                className=" w-20 text-sm rounded  hover:text-white font-Mate bg-gray-400 px-2  mx-1 md:my-1"
+              >
                 Abandonar
               </button>
             </div>

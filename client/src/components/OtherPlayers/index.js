@@ -34,17 +34,9 @@ export function OtherPlayers() {
 
   return (
     <div className="pt-4 flex flex-col items-center gap-2 md:gap-4  ">
-      {otherPlayers !== null ? (
-        otherPlayers.map((player, index) => {
-          return (
-            <div key={index}>
-              <Player myHand={false} player={player}></Player>
-            </div>
-          );
-        })
-      ) : (
-        <div></div>
-      )}
+      {otherPlayers?.map((player, index) => {
+        return <Player key={index} myHand={false} player={player}></Player>;
+      })}
     </div>
   );
 }
